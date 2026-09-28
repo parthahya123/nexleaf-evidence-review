@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexleaf Analytics — Evidence Review</title>
+  <style>
+    :root {
+      --navy: #1a2744;
+      --blue: #2563eb;
+      --light-blue: #eff6ff;
+      --green: #16a34a;
+      --amber: #d97706;
+      --red: #dc2626;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --text: #1f2937;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.65; color: var(--text); background: #fff; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; background: var(--navy); z-index: 100; padding: 0 2rem; display: flex; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.07); overflow-x: auto; }
+    nav .brand { color: #fff; font-weight: 700; font-size: 13px; letter-spacing: 0.02em; padding: 0.9rem 1.25rem 0.9rem 0; border-right: 1px solid rgba(255,255,255,0.15); margin-right: 1.25rem; white-space: nowrap; flex-shrink: 0; }
+    nav a { color: rgba(255,255,255,0.65); text-decoration: none; font-size: 13px; padding: 0.9rem 0.65rem; transition: color 0.15s; white-space: nowrap; }
+    nav a:hover { color: #fff; }
+
+    /* HERO */
+    .hero { background: var(--navy); color: #fff; padding: 4.5rem 2rem 3.5rem; text-align: center; }
+    .hero .eyebrow { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 1rem; }
+    .hero h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.15; max-width: 740px; margin: 0 auto 1.25rem; }
+    .hero p { font-size: 1.05rem; color: rgba(255,255,255,0.72); max-width: 620px; margin: 0 auto 1.5rem; }
+    .hero .meta { font-size: 12px; color: rgba(255,255,255,0.38); }
+
+    /* SENSITIVITY BANNER */
+    .sensitivity-banner { background: #fefce8; border-left: 4px solid #ca8a04; padding: 1.5rem 2rem; max-width: 860px; margin: 2.5rem auto 0; border-radius: 0 6px 6px 0; }
+    .sensitivity-banner h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #92400e; margin-bottom: 0.5rem; }
+    .sensitivity-banner p { color: #78350f; font-size: 0.92rem; line-height: 1.65; }
+    .sensitivity-banner code { background: rgba(0,0,0,0.09); padding: 1px 5px; border-radius: 3px; font-size: 0.88em; font-family: 'SF Mono', 'Fira Code', monospace; }
+
+    /* LAYOUT */
+    .container { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 3.5rem 0; border-bottom: 1px solid var(--gray-200); }
+    section:last-child { border-bottom: none; }
+    h2 { font-size: 1.45rem; font-weight: 800; color: var(--navy); margin-bottom: 0.3rem; }
+    .section-sub { color: var(--gray-500); font-size: 0.88rem; margin-bottom: 2rem; }
+    h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 2rem 0 0.6rem; }
+    p { margin-bottom: 0.85rem; }
+    p:last-child { margin-bottom: 0; }
+
+    /* SCENARIO TABLE */
+    .data-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .data-table th { background: var(--navy); color: #fff; padding: 0.6rem 0.9rem; text-align: left; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .data-table td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--gray-200); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:nth-child(even) td { background: var(--gray-50); }
+    .data-table .hl { font-weight: 700; }
+    .data-table .good { color: var(--green); font-weight: 700; }
+    .data-table .warn { color: var(--amber); font-weight: 700; }
+    .data-table .bad { color: var(--red); font-weight: 700; }
+
+    /* eM TABLE */
+    .em-row-good td { background: #f0fdf4 !important; }
+    .em-row-mid td { background: #fffbeb !important; }
+    .em-row-bad td { background: #fef2f2 !important; }
+
+    /* TORNADO */
+    .tornado { margin: 1.25rem 0; }
+    .tornado-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.55rem; }
+    .tornado-label { font-size: 0.82rem; color: var(--gray-700); width: 200px; flex-shrink: 0; font-family: 'SF Mono','Fira Code',monospace; }
+    .tornado-bar-wrap { flex: 1; background: var(--gray-200); border-radius: 3px; height: 20px; overflow: hidden; }
+    .tornado-bar { height: 100%; border-radius: 3px; background: var(--navy); display: flex; align-items: center; padding-left: 6px; }
+    .tornado-bar span { font-size: 11px; color: #fff; font-weight: 700; white-space: nowrap; }
+    .tornado-rho { font-size: 0.82rem; color: var(--gray-500); width: 50px; flex-shrink: 0; text-align: right; font-family: 'SF Mono','Fira Code',monospace; }
+
+    /* EVIDENCE ROWS */
+    .evidence-list { margin: 1rem 0; }
+    .evidence-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.8rem 0; border-bottom: 1px solid var(--gray-100); }
+    .evidence-row:last-child { border-bottom: none; }
+    .ev-icon { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-top: 2px; }
+    .ev-check { background: #dcfce7; color: #15803d; }
+    .ev-x { background: #fee2e2; color: #b91c1c; }
+    .ev-q { background: #fef3c7; color: #b45309; }
+    .ev-text { font-size: 0.9rem; color: var(--gray-700); line-height: 1.55; }
+    .ev-text strong { color: var(--gray-900); }
+    .ev-cite { font-size: 0.78rem; color: var(--gray-400); margin-top: 0.2rem; }
+
+    /* BADGES */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+    .badge-red { background: #fee2e2; color: #b91c1c; }
+    .badge-gray { background: var(--gray-200); color: var(--gray-700); }
+
+    /* STAT CARDS */
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.85rem; margin: 1.25rem 0; }
+    .stat-card { border: 1px solid var(--gray-200); border-radius: 8px; padding: 1rem 1.1rem; background: #fff; }
+    .stat-card .sl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 0.2rem; }
+    .stat-card .sv { font-size: 1.4rem; font-weight: 800; color: var(--navy); line-height: 1.1; }
+    .stat-card .sn { font-size: 11px; color: var(--gray-400); margin-top: 0.15rem; }
+
+    /* COUNTRY TABS */
+    .tab-buttons { display: flex; border-bottom: 2px solid var(--gray-200); margin-bottom: 1.5rem; gap: 0; }
+    .tab-btn { background: none; border: none; padding: 0.6rem 1.25rem; font-size: 0.9rem; font-weight: 600; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* CALLOUT */
+    .callout { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+    .callout.warn { background: #fffbeb; border-color: #fde68a; }
+    .callout.good { background: #f0fdf4; border-color: #bbf7d0; }
+    .callout .callout-head { font-weight: 700; font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); margin-bottom: 0.4rem; }
+    .callout.warn .callout-head { color: #92400e; }
+    .callout.good .callout-head { color: #15803d; }
+    .callout p { font-size: 0.92rem; color: var(--gray-700); margin-bottom: 0; }
+
+    /* COMPARATOR VIZ */
+    .comparator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    .comp-card { border-radius: 8px; padding: 1.25rem; border: 1px solid; }
+    .comp-card.c1 { background: #f0fdf4; border-color: #86efac; }
+    .comp-card.c2 { background: #fef2f2; border-color: #fca5a5; }
+    .comp-card .comp-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+    .comp-card.c1 .comp-label { color: #15803d; }
+    .comp-card.c2 .comp-label { color: #b91c1c; }
+    .comp-card .comp-value { font-size: 1.7rem; font-weight: 800; line-height: 1.1; margin-bottom: 0.3rem; }
+    .comp-card.c1 .comp-value { color: #15803d; }
+    .comp-card.c2 .comp-value { color: #b91c1c; }
+    .comp-card .comp-desc { font-size: 0.82rem; color: var(--gray-700); }
+
+    /* LAYER COMPARISON */
+    .layer-bars { margin: 1.25rem 0; }
+    .layer-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.65rem; }
+    .layer-label { font-size: 0.82rem; width: 220px; flex-shrink: 0; color: var(--gray-700); }
+    .layer-bar-wrap { flex: 1; }
+    .layer-bar { height: 22px; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; }
+    .layer-bar span { font-size: 11px; font-weight: 700; color: #fff; }
+    .layer-val { font-size: 0.82rem; color: var(--gray-500); width: 110px; flex-shrink: 0; text-align: right; font-family: 'SF Mono','Fira Code',monospace; }
+
+    /* BOTTOM LINE */
+    .bottom-box { background: var(--navy); color: #fff; border-radius: 10px; padding: 2rem 2.5rem; margin-top: 1.5rem; }
+    .bottom-box h3 { color: #fff; font-size: 1rem; margin-bottom: 0.75rem; }
+    .bottom-box p { color: rgba(255,255,255,0.8); margin-bottom: 0.65rem; }
+    .bottom-box p:last-child { margin-bottom: 0; }
+    .bottom-box .data-request { background: rgba(255,255,255,0.08); border-radius: 6px; padding: 1rem 1.25rem; margin-top: 1rem; }
+    .bottom-box .data-request .dr-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; }
+    .bottom-box .data-request ol { color: rgba(255,255,255,0.75); font-size: 0.88rem; padding-left: 1.25rem; }
+    .bottom-box .data-request li { margin-bottom: 0.35rem; }
+
+    footer { background: var(--gray-100); padding: 1.5rem 2rem; text-align: center; font-size: 12px; color: var(--gray-500); border-top: 1px solid var(--gray-200); }
+    @media (max-width: 640px) {
+      .comparator-grid { grid-template-columns: 1fr; }
+      .tornado-label { width: 140px; font-size: 0.75rem; }
+      .layer-label { width: 160px; }
+      .container { padding: 0 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Nexleaf — Evidence Review</div>
+  <a href="#sensitivity">Key Sensitivity</a>
+  <a href="#sensing">Value of Sensing</a>
+  <a href="#ai-uplift">AI Uplift</a>
+  <a href="#countries">Countries</a>
+  <a href="#layers">Layer Comparison</a>
+  <a href="#bottom-line">Bottom Line</a>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">Renaissance Philanthropy · September 2026</div>
+  <h1>Does Nexleaf's AI Add Marginal Value to Cold Chain Maintenance?</h1>
+  <p>An empirical review of two questions: what do remote sensors actually add over existing monitoring, and can AI guidance enable frontline workers to resolve failures without a specialist?</p>
+  <div class="meta">Based on deep research across WHO, UNICEF, Gavi, PATH, and peer-reviewed literature · Focus countries: Rwanda, Tanzania, Ethiopia</div>
+</div>
+
+<div class="container">
+
+  <!-- SENSITIVITY BANNER -->
+  <div class="sensitivity-banner" id="sensitivity">
+    <h3>The Key Sensitivity</h3>
+    <p>
+      The cost-effectiveness of Nexleaf's AI layer turns on a single empirical question: what fraction of cold chain equipment downtime can be resolved by a frontline health worker with AI guidance — no specialist, no additional parts? Call this <code>eM</code>. If <code>eM</code> = 0.10–0.20 (binding constraint is material: parts, technicians, budget), the AI layer costs <strong>$2,183–$4,365/DALY</strong>. If <code>eM</code> = 0.40–0.50 (binding constraint is informational, as Nexleaf verbally claimed), the number improves substantially. The sections below present the empirical evidence bearing on each half of the question.
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1: VALUE OF SENSING -->
+  <!-- ============================================================ -->
+  <section id="sensing">
+    <h2>1. Marginal Value of Remote Temperature Sensing</h2>
+    <div class="section-sub">What does adding a ColdTrace sensor change over what's already in place?</div>
+
+    <h3>The comparator determines everything</h3>
+    <p>
+      Nexleaf's headline claims ("up to 80% reduction in vaccine loss," "63% reduction in equipment downtime") come from comparisons against <em>no electronic monitoring</em> or paper thermometers. The marginal value of a real-time sensor against a 30-day electronic recorder — the WHO/UNICEF standard alternative present in most Gavi-funded facilities — is a different and smaller number. Our Monte Carlo across 30,000 draws shows:
+    </p>
+
+    <div class="comparator-grid">
+      <div class="comp-card c1">
+        <div class="comp-label">vs. Paper Thermometer · High Repair (Rwanda)</div>
+        <div class="comp-value">$338/DALY</div>
+        <div class="comp-desc">Median. P(≤$300) = 39%. This is Nexleaf's best case — and an increasingly rare baseline as Gavi CCEOP has equipped most target facilities with 30-day recorders.</div>
+      </div>
+      <div class="comp-card c2">
+        <div class="comp-label">vs. 30-Day Recorder · Realistic Repair Capacity</div>
+        <div class="comp-value">$2,306–$5,201</div>
+        <div class="comp-desc">Per DALY. Against the actual counterfactual in Rwanda, Tanzania, and Uganda, marginal uptime gain approaches zero. P(≤$300) = 0.000.</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Median $/DALY</th>
+          <th>P10 / P90</th>
+          <th>P(≤$300)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>vs. paper thermometer + high repair (Rwanda-like)</td>
+          <td class="good">$338</td>
+          <td>$203 / $586</td>
+          <td>0.386</td>
+        </tr>
+        <tr>
+          <td>vs. paper thermometer + low repair (TZ/UG-like)</td>
+          <td class="warn">$760</td>
+          <td>$438 / $1,379</td>
+          <td>0.012</td>
+        </tr>
+        <tr>
+          <td><strong>vs. 30-day recorder + high repair</strong></td>
+          <td class="bad">$2,306</td>
+          <td>$1,124 / $5,921</td>
+          <td>0.000</td>
+        </tr>
+        <tr>
+          <td><strong>vs. 30-day recorder + low repair</strong></td>
+          <td class="bad">$5,201</td>
+          <td>$2,442 / $13,660</td>
+          <td>0.000</td>
+        </tr>
+        <tr>
+          <td>Blended central (50/50 comparator, 50/50 repair)</td>
+          <td class="warn">$1,218</td>
+          <td>$299 / $7,076</td>
+          <td>0.101</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>What real-time monitoring adds over a 30-day recorder</h3>
+    <p>
+      A 30-day recorder logs temperature continuously; it is downloaded at the monthly supervisory visit. The only marginal value of real-time alerting is <em>faster detection</em> of excursions. Faster detection generates faster response — but only where response capacity exists: technician available, parts in stock, budget to deploy. In facilities where the binding constraint is spare parts or technician availability (which is every evaluated SSA cold chain setting), an alert arriving in real time plays out identically to one discovered at the monthly download: no one can act on it either way.
+    </p>
+
+    <div class="callout warn">
+      <div class="callout-head">The two conditions for sensors to clear $300/DALY are in tension</div>
+      <p><strong>Condition 1:</strong> Counterfactual is paper thermometer only (no electronic monitoring). This is the +16pp uptime world — increasingly rare as Gavi CCEOP has equipped most target facilities. <strong>Condition 2:</strong> High repair capacity exists so detected faults convert to repaired uptime. This is exactly the mature cold-chain system setting where additionality is lowest and Gavi CCEOP already funds the repair backbone. The two conditions rarely coexist.</p>
+    </div>
+
+    <h3>Why the tornado tells you this is an effect-size bet, not a cost bet</h3>
+
+    <div class="tornado">
+      <div class="tornado-row">
+        <div class="tornado-label">uptime_effect_pp</div>
+        <div class="tornado-bar-wrap"><div class="tornado-bar" style="width:100%"><span>ρ = −0.871</span></div></div>
+        <div class="tornado-rho">−0.871</div>
+      </div>
+      <div class="tornado-row">
+        <div class="tornado-label">repair_conversion</div>
+        <div class="tornado-bar-wrap"><div class="tornado-bar" style="width:40%"><span>ρ = −0.356</span></div></div>
+        <div class="tornado-rho">−0.356</div>
+      </div>
+      <div class="tornado-row">
+        <div class="tornado-label">at_risk_fraction</div>
+        <div class="tornado-bar-wrap"><div class="tornado-bar" style="width:25%"><span>ρ = −0.215</span></div></div>
+        <div class="tornado-rho">−0.215</div>
+      </div>
+      <div class="tornado-row">
+        <div class="tornado-label">protection_loss</div>
+        <div class="tornado-bar-wrap"><div class="tornado-bar" style="width:10%"><span></span></div></div>
+        <div class="tornado-rho">−0.089</div>
+      </div>
+      <div class="tornado-row">
+        <div class="tornado-label">sensor_cost_per_facility</div>
+        <div class="tornado-bar-wrap"><div class="tornado-bar" style="width:8%; background: #dc2626;"><span></span></div></div>
+        <div class="tornado-rho">+0.074</div>
+      </div>
+    </div>
+    <p style="font-size:0.82rem; color:var(--gray-500); margin-top: 0.25rem;">Spearman rank correlation vs blended $/DALY (N=30,000). <code>uptime_effect_pp</code> dominates by 2.4× over the next driver. Making sensors cheaper does not save the CE case — the question is entirely whether sensors remove real incremental downtime.</p>
+
+    <h3>The "up to 80%" claim</h3>
+    <p>
+      Nexleaf's proposal cites "up to 80% reduction in vaccine loss" and "63% reduction in equipment downtime." These figures come from the PATH/Nexleaf Mozambique evaluation, where the comparator was <em>no remote monitoring</em> — paper thermometers and manual logbooks. That is not the counterfactual in Rwanda, Tanzania, or Uganda today, where Gavi CCEOP deployments have put 30-day recorders in most facilities and where Nexleaf's own ColdTrace is already essentially national in Rwanda. The 80% headline does not transfer to these settings.
+    </p>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2: AI UPLIFT -->
+  <!-- ============================================================ -->
+  <section id="ai-uplift">
+    <h2>2. AI Uplift: Can Frontline Workers Resolve Failures?</h2>
+    <div class="section-sub">Is the binding constraint on cold chain downtime informational (fixable by AI guidance) or material (spare parts, technicians, budget)?</div>
+
+    <h3>The core question: what is eM?</h3>
+    <p>
+      <code>eM</code> is the fraction of equipment downtime that an information-only tool — the AI troubleshooting assistant — can address without additional parts, a specialist technician, or a new budget line. Nexleaf's AI case rests on eM being high. The evidence says it is low.
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>eM value</th>
+          <th>Interpretation</th>
+          <th>AI gross $/DALY</th>
+          <th>Additionality-adj $/DALY</th>
+          <th>Evidence status</th>
+        </tr>
+      </thead>
+      <tbody class="em-row-good">
+        <tr class="em-row-bad">
+          <td class="hl">0.10</td>
+          <td>AI resolves coordination/diagnosis slice only</td>
+          <td class="bad">$4,365</td>
+          <td class="bad">$10,913</td>
+          <td><span class="badge badge-green">Defensible</span></td>
+        </tr>
+        <tr class="em-row-bad">
+          <td class="hl">0.20</td>
+          <td>Generous coordination gains</td>
+          <td class="bad">$2,183</td>
+          <td class="bad">$5,456</td>
+          <td><span class="badge badge-green">Defensible</span></td>
+        </tr>
+        <tr class="em-row-mid">
+          <td class="hl">0.35</td>
+          <td>Requires "half informational" verbal claim</td>
+          <td class="warn">$1,247</td>
+          <td class="warn">$3,118</td>
+          <td><span class="badge badge-amber">Unsupported</span></td>
+        </tr>
+        <tr class="em-row-mid">
+          <td class="hl">0.50</td>
+          <td>Verbal steelman</td>
+          <td class="warn">$873</td>
+          <td class="warn">$2,183</td>
+          <td><span class="badge badge-red">Contradicted by written evidence</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>What the written evidence says</h3>
+
+    <div class="evidence-list">
+      <div class="evidence-row">
+        <div class="ev-icon ev-x">✕</div>
+        <div class="ev-text">
+          <strong>Nexleaf co-authored Mozambique study (83 fridges, 27 failures):</strong> Failures attributed "mostly related to a lack of spare parts, including solar batteries, and the unavailability of the technician for regular preventive and corrective maintenance." This is the most direct test — Nexleaf's own data, same intervention setting — and it contradicts the "only 1 in 5 failures need a part" verbal claim.
+          <div class="ev-cite">Yavari et al. (Nexleaf / MoH / VillageReach co-authored poster)</div>
+        </div>
+      </div>
+      <div class="evidence-row">
+        <div class="ev-icon ev-x">✕</div>
+        <div class="ev-text">
+          <strong>VillageReach Mozambique (uptime 40% → 96%):</strong> The active ingredient was a dedicated integrated distribution system — workers visiting on a schedule, delivering vaccines <em>and</em> carrying parts <em>and</em> performing preventive maintenance. Repairs were fuses, batteries, and full device replacements. Information was incidental; parts and scheduled labor were the intervention.
+          <div class="ev-cite">VillageReach Mozambique evaluation; also co-authored by Nexleaf</div>
+        </div>
+      </div>
+      <div class="evidence-row">
+        <div class="ev-icon ev-x">✕</div>
+        <div class="ev-text">
+          <strong>Tanzania:</strong> 30–50% of equipment downtime attributed to unstructured maintenance and limited technician <em>deployment</em> (not knowledge), plus spare parts available only at national level, not sub-nationally.
+          <div class="ev-cite">Country cold-chain EPI reviews; R3 baseline data</div>
+        </div>
+      </div>
+      <div class="evidence-row">
+        <div class="ev-icon ev-x">✕</div>
+        <div class="ev-text">
+          <strong>Niger human-centered-design study:</strong> Barriers were hierarchical structure producing communication lag, centralized spare parts procurement unresponsive to sub-national urgency, and cold-chain maintenance not treated as an independent budget priority — not diagnostic knowledge gaps.
+          <div class="ev-cite">doi:10.1186/s40545-023-00654-w (PMC10652434)</div>
+        </div>
+      </div>
+      <div class="evidence-row">
+        <div class="ev-icon ev-x">✕</div>
+        <div class="ev-text">
+          <strong>Zambia:</strong> The intervention that restored service was deployment of 126 newly certified solar-fridge technicians — adding material labor capacity, not information.
+          <div class="ev-cite">UNICEF/Gavi Zambia technician deployment program</div>
+        </div>
+      </div>
+      <div class="evidence-row">
+        <div class="ev-icon ev-x">✕</div>
+        <div class="ev-text">
+          <strong>Gavi CCEOP evaluation:</strong> States precisely that RTM lets a technician "bring the correct spare parts on their first trip" — efficiency <em>conditional on the parts, the technician, and the budget already existing</em>. Names the binding barriers explicitly: spare parts "often not available locally," "never enough technicians when and where they are needed," "inadequate financial resources to deploy them."
+          <div class="ev-cite">Gavi CCEOP independent evaluation</div>
+        </div>
+      </div>
+      <div class="evidence-row">
+        <div class="ev-icon ev-q">?</div>
+        <div class="ev-text">
+          <strong>Nexleaf verbal claim (call, 22 Sep 2026):</strong> "Roughly half the failure burden is informational and coordination-related; only about a fifth of failures need a part." This would imply eM ≈ 0.40–0.50, making the program substantially more cost-effective. <em>This claim has no corroborating written source and is directly contradicted by the co-authored Mozambique data at the single most testable point.</em>
+        </div>
+      </div>
+      <div class="evidence-row">
+        <div class="ev-icon ev-check">✓</div>
+        <div class="ev-text">
+          <strong>Rwanda R3 training savings (2024–2026):</strong> 70–80% reduction in health-centre staff training costs and 50–60% on district-level training from AI-assisted troubleshooting documentation. This is real and demonstrates the tool's value for knowledge transfer and training efficiency — but it measures <em>training cost savings</em>, not whether failures are actually resolved by frontline workers without parts.
+          <div class="ev-cite">R3 Recommendations Report, Aug 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Two channels — only one is real</h3>
+    <p>The value of an information/AI layer decomposes into exactly two channels:</p>
+
+    <div class="callout good">
+      <div class="callout-head">Channel A — Coordination Efficiency (Real, Bounded)</div>
+      <p>Better fault triage and pre-diagnosis reduces redundant trips and gets the right part on the first visit — lowering cost per repair and shortening downtime per event. <strong>But</strong> this only applies where the material response already exists (technician, part, budget), and most of this value is capturable by a non-AI rules engine on existing sensor thresholds. It does not require LLM-grade AI.</p>
+    </div>
+    <div class="callout" style="margin-top: 0.75rem;">
+      <div class="callout-head">Channel B — Substituting for Missing Material Inputs (Near-Zero)</div>
+      <p>An AI assistant cannot create a spare part, fund a repair, or deploy a technician to a facility. Where parts, budget, or technicians are the binding constraint — which is every evaluated SSA setting — information cannot avert the downtime regardless of how good the guidance is.</p>
+    </div>
+
+    <h3>The "nurse instead of engineer" use case</h3>
+    <p>
+      Nexleaf's proposal frames the AI as enabling a nurse to handle failures without waiting for an engineer. This is the strongest version of the AI argument: if AI lowers the skill threshold enough, frontline staff who are <em>always present</em> become de facto technicians, addressing the availability problem without physically moving specialists.
+    </p>
+    <p>
+      The argument is real for a subset of failures — condenser coil cleaning, overload protector resets, thermostat adjustments, settings corrections. But the Mozambique data shows that the failures that actually keep fridges broken are solar battery failure, spare parts shortages, and technician non-availability for preventive maintenance. An AI guide cannot unstick a failed compressor, recharge refrigerant, or produce a missing fuse that isn't on-site. The nurse-instead-of-engineer use case is real for Category A failures; the evidence suggests most failures are in Categories B–D.
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Failure Category</th><th>Examples</th><th>AI-Resolvable?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>A — Guide-only</strong></td>
+          <td>Condenser cleaning, overload reset, thermostat calibration, settings correction, door alignment</td>
+          <td><span class="badge badge-green">Yes</span></td>
+        </tr>
+        <tr>
+          <td><strong>B — Common parts (pre-stockable)</strong></td>
+          <td>Fuses, solar batteries, door gaskets, temperature probes</td>
+          <td><span class="badge badge-amber">Only if parts on-site</span></td>
+        </tr>
+        <tr>
+          <td><strong>C — Specialist + uncommon parts</strong></td>
+          <td>Compressor replacement, refrigerant recharge, PCB failure, refrigeration circuit</td>
+          <td><span class="badge badge-red">No</span></td>
+        </tr>
+        <tr>
+          <td><strong>D — Infrastructure</strong></td>
+          <td>Electricity outage, voltage surge damage, solar panel failure</td>
+          <td><span class="badge badge-gray">Outside fridge scope</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 0.85rem; color: var(--gray-500);">Nexleaf's own Mozambique data shows B–C dominate. The failure-cause breakdown from their 34,000-facility sensor dataset would settle the share of Category A definitively — this data should be requested before a funding decision.</p>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3: COUNTRIES -->
+  <!-- ============================================================ -->
+  <section id="countries">
+    <h2>3. Country Profiles</h2>
+    <div class="section-sub">Cold chain baseline, monitoring coverage, and intervention headroom in Rwanda, Tanzania, and Ethiopia.</div>
+
+    <div class="tab-buttons">
+      <button class="tab-btn active" onclick="showTab('rwanda',this)">Rwanda</button>
+      <button class="tab-btn" onclick="showTab('tanzania',this)">Tanzania</button>
+      <button class="tab-btn" onclick="showTab('ethiopia',this)">Ethiopia</button>
+    </div>
+
+    <!-- RWANDA -->
+    <div class="tab-panel active" id="tab-rwanda">
+      <div class="stat-row">
+        <div class="stat-card"><div class="sl">R3 Baseline Functionality</div><div class="sv">~92%</div><div class="sn">Sampled facilities</div></div>
+        <div class="stat-card"><div class="sl">R3 Facilities Covered</div><div class="sv">283/575</div><div class="sn">49% of target facilities</div></div>
+        <div class="stat-card"><div class="sl">ColdTrace Deployment</div><div class="sv">National</div><div class="sn">Already essentially complete</div></div>
+        <div class="stat-card"><div class="sl">Spare Parts via R3/Gavi</div><div class="sv">Most mature</div><div class="sn">4,250 parts + 62 tool kits deployed</div></div>
+      </div>
+
+      <p>Rwanda has one of Africa's most functional cold chains and the strongest existing Nexleaf relationship. ColdTrace is already essentially national in Rwanda — which means the <em>marginal value of additional sensing is near-zero</em>: the counterfactual is not paper thermometers, it is existing ColdTrace plus the existing maintenance system R3 built.</p>
+
+      <p>At 92% baseline functionality, the headroom for improvement is 8 percentage points — the smallest of any target country. Rwanda is the case where both the sensor and the AI layer are most additionality-constrained. The R3 programme's most credible result (100% CCE functionality in Malawi at facilities with <em>both</em> sensors <em>and</em> Rapid Response Fund access) required the material repair infrastructure, not just sensors. Rwanda is Nexleaf's showcase — but it is also the setting where the marginal philanthropic dollar buys the least incremental impact.</p>
+
+      <div class="callout warn">
+        <div class="callout-head">Inverse Headroom Problem</div>
+        <p>Rwanda is the one country where the "parts partly solved via Gavi" claim has the most support. But where parts are partly solved, the residual downtime is small — and the marginal information layer buys the least. High system maturity and low marginal value move together.</p>
+      </div>
+    </div>
+
+    <!-- TANZANIA -->
+    <div class="tab-panel" id="tab-tanzania">
+      <div class="stat-row">
+        <div class="stat-card"><div class="sl">R3 Baseline Functionality</div><div class="sv">~81%</div><div class="sn">Sampled facilities</div></div>
+        <div class="stat-card"><div class="sl">R3 Facilities Covered</div><div class="sv">8,198/10,867</div><div class="sn">75% of target facilities</div></div>
+        <div class="stat-card"><div class="sl">National Policy Outcome</div><div class="sv">PO-RALG</div><div class="sn">Guidance issued: facility-level maintenance budgets</div></div>
+        <div class="stat-card"><div class="sl">Downtime Attribution</div><div class="sv">30–50%</div><div class="sn">Unstructured maintenance + limited tech coverage</div></div>
+      </div>
+
+      <p>Tanzania is the largest R3 country and has the most headroom (19pp vs Rwanda's 8pp). PO-RALG's issuance of national guidance on facility-level maintenance budgeting is the strongest policy outcome from R3 — a genuine systemic win. The question is whether AI supplements that policy progress or duplicates it.</p>
+
+      <p>The binding constraint evidence from Tanzania is clear: 30–50% downtime is attributed to unstructured maintenance and limited technician <em>coverage</em> — not diagnostic skill gaps. Spare parts are available at national level only, creating a last-mile bottleneck that guidance cannot resolve. At Tanzania's scale (10,867 target facilities), the material infrastructure problem is substantial and remains the ceiling for any information layer.</p>
+
+      <div class="callout good">
+        <div class="callout-head">Best Case for Maintenance Institutionalization</div>
+        <p>Tanzania's combination of PO-RALG buy-in, 19pp functionality headroom, and R3 coverage of 75% of facilities makes it the strongest candidate for the maintenance institutionalization layer — the non-AI, non-sensor component that addresses the actual binding constraint. Not the AI layer.</p>
+      </div>
+    </div>
+
+    <!-- ETHIOPIA -->
+    <div class="tab-panel" id="tab-ethiopia">
+      <div class="stat-row">
+        <div class="stat-card"><div class="sl">Population</div><div class="sv">~125M</div><div class="sn">Largest SSA after Nigeria</div></div>
+        <div class="stat-card"><div class="sl">Nexleaf Footprint</div><div class="sv">Limited</div><div class="sn">No current R3 deployment</div></div>
+        <div class="stat-card"><div class="sl">Gavi Status</div><div class="sv">Eligible</div><div class="sn">Major CCEOP recipient</div></div>
+        <div class="stat-card"><div class="sl">System Variability</div><div class="sv">High</div><div class="sn">Addis vs Afar/Somali: very different baselines</div></div>
+      </div>
+
+      <p>Ethiopia is the largest potential expansion market by population but the least understood in Nexleaf's portfolio — there is no active deployment, no R3 baseline data, and the system is highly heterogeneous. Addis Ababa and nearby highland regions have reasonably functional cold chains; Afar, Somali, and Benishangul-Gumuz regions face infrastructure challenges that go well beyond what any monitoring or AI layer can address.</p>
+
+      <p>Ethiopia is also a major Gavi CCEOP recipient, which means the counterfactual monitoring question is live: what Gavi has already put in place shapes the marginal value of Nexleaf's sensors. Electricity reliability is the dominant cold chain challenge in Ethiopia's most vulnerable regions — an infrastructure problem outside the scope of any information tool.</p>
+
+      <div class="callout">
+        <div class="callout-head">Highest Potential, Least Evidence</div>
+        <p>If Nexleaf expansion is considered, Ethiopia requires a baseline assessment before any cost-effectiveness claim can be made. The failure-cause distribution, existing monitoring coverage, and technician density vary enough by region that a national-level estimate would be misleading. The opportunity is real; the enabling conditions are unknown.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4: LAYER COMPARISON -->
+  <!-- ============================================================ -->
+  <section id="layers">
+    <h2>4. Comparing the Layers</h2>
+    <div class="section-sub">Gross $/DALY across the three components of Nexleaf's program — the maintenance layer (non-AI, non-sensor) is the best number, but nothing clears a standard global health bar.</div>
+
+    <div class="layer-bars">
+      <div class="layer-row">
+        <div class="layer-label" style="font-size:0.78rem;">GiveWell bar (~$75)</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:1.5%; background:#15803d;"><span></span></div></div>
+        <div class="layer-val" style="color:var(--green);">~$75/DALY</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label" style="font-size:0.78rem;">Cash transfer benchmark</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:5%; background:#16a34a;"><span></span></div></div>
+        <div class="layer-val" style="color:var(--green);">~$250/DALY</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label">Sensor vs paper thermometer (Rwanda)</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:6.5%; background:#d97706;"><span></span></div></div>
+        <div class="layer-val" style="color:var(--amber);">$338 median</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label">Maintenance (VillageReach analog)</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:10.5%; background:#d97706;"><span></span></div></div>
+        <div class="layer-val" style="color:var(--amber);">$540 gross</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label">Maintenance (R3-equivalent, measured)</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:18%; background:#ea580c;"><span></span></div></div>
+        <div class="layer-val" style="color:#ea580c;">$940 gross</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label">Sensor vs 30-day recorder (realistic)</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:44%; background:#dc2626;"><span>$2,306</span></div></div>
+        <div class="layer-val" style="color:var(--red);">$2,306–5,201</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label">AI layer (eM = 0.10–0.20, defensible)</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:55%; background:#dc2626;"><span>$2,183–4,365</span></div></div>
+        <div class="layer-val" style="color:var(--red);">$2,183–4,365</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label">Maintenance (additionality-adjusted)</div>
+        <div class="layer-bar-wrap"><div class="layer-bar" style="width:52%; background:#991b1b;"><span>$1,543–2,687</span></div></div>
+        <div class="layer-val" style="color:#991b1b;">$1,543–2,687</div>
+      </div>
+    </div>
+
+    <table class="data-table" style="margin-top:1.5rem;">
+      <thead>
+        <tr><th>Layer</th><th>Gross $/DALY</th><th>Additionality-adj</th><th>Addresses binding constraint?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Maintenance institutionalization (R3-equivalent)</td>
+          <td class="warn">$940</td>
+          <td class="bad">$2,687</td>
+          <td><span class="badge badge-green">Yes — directly</span></td>
+        </tr>
+        <tr>
+          <td>Sensor (vs paper thermometer, high repair)</td>
+          <td class="warn">$338</td>
+          <td class="bad">~$950</td>
+          <td><span class="badge badge-amber">Partially — only where repair exists</span></td>
+        </tr>
+        <tr>
+          <td>Sensor (vs 30-day recorder, realistic)</td>
+          <td class="bad">$2,306–5,201</td>
+          <td class="bad">>$5,000</td>
+          <td><span class="badge badge-red">No marginal effect on detection</span></td>
+        </tr>
+        <tr>
+          <td>AI layer (eM 0.10–0.20, defensible)</td>
+          <td class="bad">$2,183–4,365</td>
+          <td class="bad">$5,456–10,913</td>
+          <td><span class="badge badge-red">No — binding constraint is material</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:0.85rem; color:var(--gray-500);">Additionality adjustment: central 0.35–0.40. Gavi CCEOP already mandates costed maintenance plans (the exact maintenance-layer deliverable) and has deployed monitoring equipment (reducing sensor counterfactual gap). The genuinely additional slice is the execution and funding gap on what Gavi already requires on paper.</p>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- BOTTOM LINE -->
+  <!-- ============================================================ -->
+  <section id="bottom-line">
+    <h2>Bottom Line</h2>
+    <div class="section-sub">What does the evidence collectively imply?</div>
+
+    <p>
+      The cost-effectiveness case for Nexleaf's AI layer is not supported by the written evidence. The binding constraint on cold chain uptime in every evaluated SSA setting — including Nexleaf's own co-authored data — is material: spare parts, technician availability, and maintenance budgets. An AI troubleshooting assistant operates on diagnostic knowledge gaps, which the literature consistently ranks as a secondary or contributing factor, never the primary one.
+    </p>
+    <p>
+      The sensor layer is cost-effective only in a corner that is increasingly rare (paper thermometer counterfactual) and self-undermining (high repair capacity, where additionality is also lowest). Against the realistic 30-day recorder counterfactual in Rwanda, Tanzania, or Ethiopia, the marginal uptime improvement is near-zero and $/DALY runs to $2,300–$5,200.
+    </p>
+    <p>
+      The maintenance institutionalization layer — costed plans, asset registries, spare parts channels, technician training — is the best Nexleaf number because it attacks what actually binds. Even that lands at $540–$940/DALY gross, roughly 7–13× GiveWell, and triples to $1,543–$2,687/DALY once additionality is applied (Gavi already requires the same maintenance plans as a condition of CCE grants).
+    </p>
+
+    <div class="bottom-box">
+      <h3>What would change this assessment</h3>
+      <p>The verbal claim that most downtime is informational (not material) would, if true, substantially improve the AI case. The data to test it exists in Nexleaf's own 34,000-facility sensor dataset and in the failure-cause codes from the Mozambique 83-fridge study they co-authored. Four specific data requests would either corroborate or refute the verbal account:</p>
+
+      <div class="data-request">
+        <div class="dr-head">Data Requests Before a Funding Decision</div>
+        <ol>
+          <li>The full failure-cause breakdown from the Mozambique 83-fridge co-authored study — specifically how the 27 detected failures coded against the "only 1/5 need a part" claim.</li>
+          <li>The underlying source for "roughly half the failure burden is informational," distinguishing pure diagnostic-knowledge gaps from coordination gaps (the latter is Channel A, capturable by a rules engine, and doesn't justify an LLM premium).</li>
+          <li>Tanzania and Rwanda facility-level spare-parts availability data, with residual downtime decomposed by cause category.</li>
+          <li>Any evidence that the AI troubleshooting assistant closes downtime that a non-AI rules engine on existing ColdTrace sensor thresholds would not — an explicit swap test establishing the marginal value of the AI over a simpler alert system.</li>
+        </ol>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>
+  Renaissance Philanthropy · September 2026 · Based on deep research across WHO, UNICEF, Gavi, PATH, and peer-reviewed literature using claude-opus-4-8
+</footer>
+
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
